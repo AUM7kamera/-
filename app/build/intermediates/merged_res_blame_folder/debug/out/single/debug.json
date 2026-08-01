@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.example.weatherlocalapp-merged_res-33:/xml_backup_rules.xml.flat",
+        "source": "com.example.weatherlocalapp-main-35:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.example.weatherlocalapp-merged_res-33:/xml_file_paths.xml.flat",
+        "source": "com.example.weatherlocalapp-main-35:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.example.weatherlocalapp-merged_res-33:/xml_data_extraction_rules.xml.flat",
+        "source": "com.example.weatherlocalapp-main-35:/xml/data_extraction_rules.xml"
+    }
+]
