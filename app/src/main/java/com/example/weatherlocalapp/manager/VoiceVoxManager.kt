@@ -28,7 +28,6 @@ class VoiceVoxManager {
         .readTimeout(20, TimeUnit.SECONDS)
         .build()
 
-    // Preset list of speakers
     val speakers = listOf(
         VoiceVoxSpeaker("ずんだもん (ノーマル)", 3),
         VoiceVoxSpeaker("ずんだもん (あまあま)", 1),
@@ -43,18 +42,16 @@ class VoiceVoxManager {
         VoiceVoxSpeaker("波音リツ (ノーマル)", 9)
     )
 
-    /**
-     * Synthesizes text to WAV bytes by talking to local VOICEVOX engine.
-     */
     suspend fun synthesizeVoice(text: String, speakerId: Int, hostIp: String = "127.0.0.1"): Result<ByteArray> = withContext(Dispatchers.IO) {
         runCatching {
-            val baseUrl = "http://$hostIp:50021"
-
-            // 1. Create Audio Query
-            val queryUrl = HttpUrl.parse("$baseUrl/audio_query")?.newBuilder()
-                ?.addQueryParameter("text", text)
-                ?.addQueryParameter("speaker", speakerId.toString())
-                ?.build() ?: throw Exception("Invalid URL structure")
+            val queryUrl = HttpUrl.Builder()
+                .scheme("http")
+                .host(hostIp)
+                .port(50021)
+                .addPathSegment("audio_query")
+                .addQueryParameter("text", text)
+                .addQueryParameter("speaker", speakerId.toString())
+                .build()
 
             val queryRequest = Request.Builder()
                 .url(queryUrl)
@@ -67,10 +64,13 @@ class VoiceVoxManager {
             }
             val queryJson = queryResponse.body?.string() ?: throw Exception("Empty response for audio query")
 
-            // 2. Synthesize to WAV
-            val synthesisUrl = HttpUrl.parse("$baseUrl/synthesis")?.newBuilder()
-                ?.addQueryParameter("speaker", speakerId.toString())
-                ?.build() ?: throw Exception("Invalid URL structure")
+            val synthesisUrl = HttpUrl.Builder()
+                .scheme("http")
+                .host(hostIp)
+                .port(50021)
+                .addPathSegment("synthesis")
+                .addQueryParameter("speaker", speakerId.toString())
+                .build()
 
             val synthesisRequest = Request.Builder()
                 .url(synthesisUrl)
@@ -86,9 +86,6 @@ class VoiceVoxManager {
         }
     }
 
-    /**
-     * Saves the WAV bytes to the terminal's Download/VOICEVOX folder and returns its URI.
-     */
     suspend fun saveWavFile(context: Context, bytes: ByteArray, fileName: String): Result<Uri> = withContext(Dispatchers.IO) {
         runCatching {
             val resolver = context.contentResolver
@@ -117,7 +114,6 @@ class VoiceVoxManager {
                     throw e
                 }
             } else {
-                // Pre-Q fallback using direct file write
                 val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 val voiceVoxDir = File(downloadsDir, "VOICEVOX")
                 if (!voiceVoxDir.exists()) {
@@ -132,9 +128,6 @@ class VoiceVoxManager {
         }
     }
 
-    /**
-     * Shares the file using Android ACTION_SEND.
-     */
     fun shareWavFile(context: Context, uri: Uri) {
         val shareableUri = if (uri.scheme == "file") {
             val file = File(uri.path ?: throw Exception("Invalid file URI"))
