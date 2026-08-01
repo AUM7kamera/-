@@ -13,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,7 +93,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Initialize MapLibre Native SDK (must be done before inflation)
-        Mapbox.getInstance(this, null)
+        Mapbox.getInstance(this)
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
@@ -152,10 +154,10 @@ fun AppMainScreen(viewModel: MainViewModel) {
     var currentTab by remember { mutableStateOf(0) }
     val tabTitles = listOf("雨雲レーダー", "天気・警報", "タイムライン", "VOICEVOX")
     val tabIcons = listOf(
-        Icons.Default.Map,
-        Icons.Default.Cloud,
+        Icons.Default.Place,
+        Icons.Default.Info,
         Icons.Default.List,
-        Icons.Default.VolumeUp
+        Icons.Default.PlayArrow
     )
 
     Scaffold(
@@ -518,7 +520,7 @@ fun WeatherForecastScreen(viewModel: MainViewModel) {
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                     ) {
-                        Icon(Icons.Default.SystemUpdate, contentDescription = null)
+                        Icon(Icons.Default.Refresh, contentDescription = null)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("アップデート確認")
                     }
@@ -840,7 +842,7 @@ fun VoiceVoxScreen(viewModel: MainViewModel) {
                                 onClick = { playAudio(context, voiceState.uri) },
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                             ) {
-                                Icon(Icons.Default.VolumeUp, contentDescription = null)
+                                Icon(Icons.Default.PlayArrow, contentDescription = null)
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("再生")
                             }
